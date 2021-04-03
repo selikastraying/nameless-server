@@ -1,0 +1,1 @@
+exports.getTime = () => Date.now();

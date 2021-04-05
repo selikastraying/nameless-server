@@ -24,11 +24,13 @@ app.post('/upload', async (req, res) => {
       });
     } else {
       const { file } = req.files;
-      file.mv(`./uploads/${file.name}`);
+      const { id } = tokens.checkToken(req.body.token);
+      const filename = `${id}${time.getTime()}.${file.name.split('.')[file.name.split('.').length - 1]}`;
+      file.mv(`./uploads/${filename}`);
       chats.sentPic(
         tokens.checkToken(req.body.token).id,
         req.body.chatid,
-        file.name,
+        filename,
         time.getTime(),
       );
       res.send({
@@ -85,41 +87,5 @@ app.get('/register', (req, res) => {
   if (users.register(req.query.id, req.query.pass)) res.end(tokens.getToken(req.query.id));
   else res.status(500).send({ error: 'Something failed!' });
 });
-
-// app.get('/checkToken', (req, res) => {
-//   res.end(tokens.checkToken(req.query.token).id);
-// });
-
-// app.get('/getChats', (req, res) => {
-//   res.end(chats.getChats(tokens.checkToken(req.query.token).id));
-// });
-
-// app.get('/getChat', (req, res) => {
-//   res.end(chats.getChat(req.query.chatid));
-// });
-
-
-// app.get('/sentChat', (req, res) => {
-//   if (chats.sentChat(tokens.checkToken(req.query.token).id,
-//     req.query.chatid,
-//     req.query.newchat,
-//     time.getTime())) res.end();
-//   else res.status(500).send({ error: 'Something failed!' });
-// });
-
-// app.get('/createChat', (req, res) => {
-//   const { id } = tokens.checkToken(req.query.token);
-//   const chatid = chats.createChat(id, req.query.member, req.query.newchat, time.getTime());
-//   req.query.member.forEach((m) => {
-//     let { chatname } = req.query;
-//     if (chatname === '') { chatname = req.query.member.filter((self) => self !== m).join('"'); }
-//     users.addChat(m, chatid, chatname);
-//   });
-//   let { chatname } = req.query;
-//   if (chatname === '') { chatname = req.query.member.filter((m) => m !== id).join('"'); }
-//   users.addChat(id, chatid, chatname);
-//   const chat = JSON.stringify({ id: chatid, name: chatname });
-//   res.end(chat);
-// });
 
 app.listen(3000);

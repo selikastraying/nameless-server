@@ -33,10 +33,13 @@ exports.register = (id, pass) => {
 exports.addChat = (id, chatid, chatname) => {
   const fd = fs.readFileSync(`users/${id}.json`);
   const user = JSON.parse(fd);
-  const chat = JSON.parse(`{"id":"${chatid}","name":"${chatname}"}`);
-  user.chats.push(chat);
-  fs.writeFileSync(`users/${id}.json`, JSON.stringify(user), () => {
-    // console.log('The file has been saved!');
-  });
+  const exist = user.chats.find((chat) => chat.id === chatid);
+  if (!exist) {
+    const chat = JSON.parse(`{"id":"${chatid}","name":"${chatname}"}`);
+    user.chats.push(chat);
+    fs.writeFileSync(`users/${id}.json`, JSON.stringify(user), () => {
+      // console.log('The file has been saved!');
+    });
+  }
   return true;
 };

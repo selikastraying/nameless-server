@@ -1,5 +1,7 @@
 const fs = require('fs');
 
+exports.getAllChatList = () => JSON.stringify(fs.readdirSync('./chats/'));
+
 exports.getChatList = (id) => {
   const fd = fs.readFileSync(`users/${id}.json`);
   return JSON.stringify(JSON.parse(fd).chats);
@@ -30,9 +32,9 @@ exports.sentPic = (id, chatid, picpath, time) => {
   return 'success';
 };
 
-exports.createChat = (id, newchat, time) => {
+exports.createChat = (id, time) => {
   const chatid = id + time;
-  const chat = `{"chat":[{"id":1,"name":"${id}","content":"${newchat}"}]}`;
+  const chat = '{"chat":[{"id":0}]}';
   fs.writeFileSync(`chats/${chatid}.json`, chat, () => {
     // console.log('The file has been saved!');
   });

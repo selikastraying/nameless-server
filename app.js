@@ -52,6 +52,10 @@ app.get('/getToken', (req, res) => {
   res.end(tokens.getToken(req.query.id));
 });
 
+app.get('/getAllChatList', (req, res) => {
+  res.end(chats.getChatList('admin'));
+});
+
 app.get('/getChatList', (req, res) => {
   res.end(chats.getChatList(tokens.checkToken(req.query.token).id));
 });
@@ -70,11 +74,27 @@ app.get('/sentChat', (req, res) => {
 });
 
 app.get('/createChat', (req, res) => {
-  res.end(chats.sentChat(
+  const chatid = chats.createChat(tokens.checkToken(req.query.token).id, time.getTime());
+  users.addChat(
+    'admin',
+    chatid,
+    req.query.chatname,
+  );
+  users.addChat(
     tokens.checkToken(req.query.token).id,
-    req.query.newchat,
-    time.getTime(),
-  ));
+    chatid,
+    req.query.chatname,
+  );
+  res.end(chatid);
+});
+
+app.get('/joinChat', (req, res) => {
+  users.addChat(
+    tokens.checkToken(req.query.token).id,
+    req.query.chatid,
+    req.query.chatname,
+  );
+  res.end('success');
 });
 
 app.get('/login', (req, res) => {

@@ -1,12 +1,48 @@
 const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+
+const app = express();
+
+const http = require('http').Server(app);
+const io = require('socket.io')(http, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
 const users = require('./modules/users');
 const chats = require('./modules/chats');
 const tokens = require('./modules/tokens');
 const time = require('./modules/time');
 
-const app = express();
+const rooms = { '00000001': [{ name: 'selika', content: 'Hello World' }], '00000002': [{ name: 'selika', content: 'Hello World2' }] };
+
+
+io.on('connection', (socket) => {
+  socket.on('join', (m) => {
+    socket.join(m.room);
+    io.emit('allMessage', rooms[m.room]);
+  });
+  socket.on('leave', (m) => {
+    socket.leave(m.room);
+  });
+  socket.on('sentMessage', (m) => {
+    rooms[m.room].push(m.message);
+    io.to(m.room).emit('newMessage', m.message);
+  });
+  socket.on('AllChatList', () => {
+    io.to(socket.id).emit('AllChatList', Object.keys(rooms));
+  });
+  socket.on('createChat', (m) => {
+    if (!Object.keys(rooms).includes(m.chatname)) {
+      rooms[m.chatname] = [];
+    } else {
+      io.to(socket.id).emit('Alert', 'chatname already used');
+    }
+  });
+});
 
 app.use(fileUpload({
   createParentPath: true,
@@ -27,21 +63,7 @@ app.post('/upload', async (req, res) => {
       const { id } = tokens.checkToken(req.body.token);
       const filename = `${id}${time.getTime()}.${file.name.split('.')[file.name.split('.').length - 1]}`;
       file.mv(`./uploads/${filename}`);
-      chats.sentPic(
-        tokens.checkToken(req.body.token).id,
-        req.body.chatid,
-        filename,
-        time.getTime(),
-      );
-      res.send({
-        status: true,
-        message: 'File is uploaded',
-        data: {
-          name: file.name,
-          mimetype: file.mimetype,
-          size: file.size,
-        },
-      });
+      res.send(filename);
     }
   } catch (err) {
     res.status(500).send(err);
@@ -92,7 +114,6 @@ app.get('/joinChat', (req, res) => {
   users.addChat(
     tokens.checkToken(req.query.token).id,
     req.query.chatid,
-    req.query.chatname,
   );
   res.end('success');
 });
@@ -108,4 +129,6 @@ app.get('/register', (req, res) => {
   else res.status(500).send({ error: 'Something failed!' });
 });
 
-app.listen(3000);
+http.listen(3000, () => {
+  console.log('listening on *:3000');
+});

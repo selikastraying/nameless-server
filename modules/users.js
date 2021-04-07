@@ -30,13 +30,13 @@ exports.register = (id, pass) => {
   return false;
 };
 
-exports.addChat = (id, chatid, chatname) => {
+exports.addChat = (id, chatid) => {
   const fd = fs.readFileSync(`users/${id}.json`);
   const user = JSON.parse(fd);
   const exist = user.chats.find((chat) => chat.id === chatid);
   if (!exist) {
-    const chat = JSON.parse(`{"id":"${chatid}","name":"${chatname}"}`);
-    user.chats.push(chat);
+    const newchat = JSON.parse(`{"id":"${chatid}"}`);
+    user.chats.push(newchat);
     fs.writeFileSync(`users/${id}.json`, JSON.stringify(user), () => {
       // console.log('The file has been saved!');
     });

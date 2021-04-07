@@ -16,9 +16,7 @@ exports.sentChat = (id, chatid, newchat, time) => {
   const fd = fs.readFileSync(`chats/${chatid}.json`);
   const chat = JSON.parse(fd);
   chat.chat.push(JSON.parse(`{"id":${chat.chat[chat.chat.length - 1].id + 1},"name":"${id}","content":"${newchat}","time":${time}}`));
-  fs.writeFileSync(`chats/${chatid}.json`, JSON.stringify(chat), () => {
-    // console.log('The file has been saved!');
-  });
+  fs.writeFileSync(`chats/${chatid}.json`, JSON.stringify(chat));
   return 'success';
 };
 
@@ -26,9 +24,7 @@ exports.sentPic = (id, chatid, picpath, time) => {
   const fd = fs.readFileSync(`chats/${chatid}.json`);
   const chat = JSON.parse(fd);
   chat.chat.push(JSON.parse(`{"id":${chat.chat[chat.chat.length - 1].id + 1},"name":"${id}","pic":"${picpath}","time":${time}}`));
-  fs.writeFileSync(`chats/${chatid}.json`, JSON.stringify(chat), () => {
-    // console.log('The file has been saved!');
-  });
+  fs.writeFileSync(`chats/${chatid}.json`, JSON.stringify(chat));
   return 'success';
 };
 

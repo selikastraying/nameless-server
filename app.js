@@ -23,7 +23,7 @@ const rooms = { 'Hello World': [{ name: 'selika', content: 'Hello World' }], 'He
 io.on('connection', (socket) => {
   socket.on('join', (m) => {
     socket.join(m.room);
-    io.emit('allMessage', rooms[m.room]);
+    io.to(socket.id).emit('allMessage', rooms[m.room]);
   });
   socket.on('leave', (m) => {
     socket.leave(m.room);

@@ -17,7 +17,7 @@ const chats = require('./modules/chats');
 const tokens = require('./modules/tokens');
 const time = require('./modules/time');
 
-const rooms = { '00000001': [{ name: 'selika', content: 'Hello World' }], '00000002': [{ name: 'selika', content: 'Hello World2' }] };
+const rooms = { 'Hello World': [{ name: 'selika', content: 'Hello World' }], 'Hello World2': [{ name: 'selika', content: 'Hello World2' }] };
 
 
 io.on('connection', (socket) => {
